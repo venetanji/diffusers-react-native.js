@@ -1,6 +1,7 @@
-import { PNDMScheduler, PNDMSchedulerConfig } from '@/schedulers/PNDMScheduler'
+"use strict"
+import { LCMScheduler, LCMSchedulerConfig } from '@/schedulers/LCMScheduler'
 import { CLIPTokenizer } from '@/tokenizers/CLIPTokenizer'
-import { cat, randomNormalTensor } from '@/util/Tensor'
+import { cat, randomNormalTensor, range } from '@/util/Tensor'
 import { Tensor } from '@xenova/transformers'
 import { dispatchProgress, loadModel, PretrainedOptions, ProgressCallback, ProgressStatus } from './common'
 import { getModelJSON } from '@/hub'
@@ -25,9 +26,9 @@ export interface StableDiffusionInput {
 }
 
 export class StableDiffusionPipeline extends PipelineBase {
-  declare scheduler: PNDMScheduler
+  declare scheduler: LCMScheduler
 
-  constructor (unet: Session, vaeDecoder: Session, vaeEncoder: Session, textEncoder: Session, tokenizer: CLIPTokenizer, scheduler: PNDMScheduler) {
+  constructor (unet: Session, vaeDecoder: Session, vaeEncoder: Session, textEncoder: Session, tokenizer: CLIPTokenizer, scheduler: LCMScheduler) {
     super()
     this.unet = unet
     this.vaeDecoder = vaeDecoder
@@ -38,8 +39,8 @@ export class StableDiffusionPipeline extends PipelineBase {
     this.vaeScaleFactor = 8
   }
 
-  static createScheduler (config: PNDMSchedulerConfig) {
-    return new PNDMScheduler(
+  static createScheduler (config: LCMSchedulerConfig) {
+    return new LCMScheduler(
       {
         prediction_type: 'epsilon',
         ...config,
@@ -72,6 +73,20 @@ export class StableDiffusionPipeline extends PipelineBase {
     return new StableDiffusionPipeline(unet, vae, vaeEncoder, textEncoder, tokenizer, scheduler)
   }
 
+  getWEmbedding (batchSize: number, guidanceScale: number, embeddingDim = 512) {
+    let w = new Tensor('float32', new Float32Array([guidanceScale]), [1])
+    w = w.mul(1000)
+
+    const halfDim = embeddingDim / 2
+    let log = Math.log(10000) / (halfDim - 1)
+    let emb: Tensor = range(0, halfDim).mul(-log).exp()
+
+    // TODO: support batch size > 1
+    emb = emb.mul(w.data[0])
+
+    return cat([emb.sin(), emb.cos()]).reshape([batchSize, embeddingDim])
+  }
+
   async run (input: StableDiffusionInput) {
     const width = input.width || 512
     const height = input.height || 512
@@ -86,33 +101,21 @@ export class StableDiffusionPipeline extends PipelineBase {
 
     const promptEmbeds = await this.getPromptEmbeds(input.prompt, input.negativePrompt)
 
-    const latentShape = [batchSize, 4, width / 8, height / 8]
-    let latents = randomNormalTensor(latentShape, undefined, undefined, 'float32', seed) // Normal latents used in Text-to-Image
+    let latents = this.prepareLatents(
+      batchSize,
+      this.unet.config.in_channels as number || 4,
+      height,
+      width,
+      seed,
+    ) // Normal latents used in Text-to-Image
     let timesteps = this.scheduler.timesteps.data
-
-    if (input.img2imgFlag) {
-      const inputImage = input.inputImage || new Float32Array()
-      const strength = input.strength || 0.8
-
-      await dispatchProgress(input.progressCallback, {
-        status: ProgressStatus.EncodingImg2Img,
-      })
-
-      const imageLatent = await this.encodeImage(inputImage, input.width, input.height) // Encode image to latent space
-
-      // Taken from https://towardsdatascience.com/stable-diffusion-using-hugging-face-variations-of-stable-diffusion-56fd2ab7a265#2d1d
-      const initTimestep = Math.round(input.numInferenceSteps * strength)
-      const timestep = timesteps.toReversed()[initTimestep]
-
-      latents = this.scheduler.addNoise(imageLatent, latents, timestep)
-      // Computing the timestep to start the diffusion loop
-      const tStart = Math.max(input.numInferenceSteps - initTimestep, 0)
-      timesteps = timesteps.slice(tStart)
-    }
 
     const doClassifierFreeGuidance = guidanceScale > 1
     let humanStep = 1
     let cachedImages: Tensor[] | null = null
+
+    const wEmbedding = this.getWEmbedding(batchSize, guidanceScale, 256)
+    let denoised: Tensor
 
     for (const step of timesteps) {
       // for some reason v1.4 takes int64 as timestep input. ideally we should get input dtype from the model
@@ -125,10 +128,11 @@ export class StableDiffusionPipeline extends PipelineBase {
         unetTimestep: humanStep,
         unetTotalSteps: timesteps.length,
       })
+
       const latentInput = doClassifierFreeGuidance ? cat([latents, latents.clone()]) : latents
 
       const noise = await this.unet.run(
-        { sample: latentInput, timestep, encoder_hidden_states: promptEmbeds },
+        { sample: latentInput, timestep, encoder_hidden_states: promptEmbeds, timestep_cond: wEmbedding },
       )
 
       let noisePred = noise.out_sample
@@ -140,7 +144,7 @@ export class StableDiffusionPipeline extends PipelineBase {
         noisePred = noisePredUncond.add(noisePredText.sub(noisePredUncond).mul(guidanceScale))
       }
 
-      latents = this.scheduler.step(
+      [latents, denoised] = this.scheduler.step(
         noisePred,
         step,
         latents,
@@ -152,7 +156,7 @@ export class StableDiffusionPipeline extends PipelineBase {
           unetTimestep: humanStep,
           unetTotalSteps: timesteps.length,
         })
-        cachedImages = await this.makeImages(latents)
+        cachedImages = await this.makeImages(denoised)
       }
       humanStep++
     }

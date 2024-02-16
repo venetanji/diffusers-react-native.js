@@ -109,7 +109,7 @@ export class LCMScheduler extends SchedulerBase {
 
     const lcmOriginSteps = this.config.original_inference_steps
     // LCM Timesteps Setting: Linear Spacing
-    const c = Math.floor(this.config.num_train_timesteps / lcmOriginSteps)
+    const c = this.config.num_train_timesteps / lcmOriginSteps
     const lcmOriginTimesteps: number[] = []
     for (let i = 1; i <= lcmOriginSteps; i++) {
       lcmOriginTimesteps.push(i * c - 1)
@@ -119,9 +119,9 @@ export class LCMScheduler extends SchedulerBase {
     const timesteps: number[] = []
     for (let i = lcmOriginTimesteps.length - 1; i >= 0; i -= skippingStep) {
       timesteps.push(lcmOriginTimesteps[i])
-      if (timesteps.length === numInferenceSteps) {
-        break
-      }
+      //if (timesteps.length === numInferenceSteps) {
+        //break
+      //}
     }
 
     this.timeIndex = 0

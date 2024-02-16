@@ -1,6 +1,6 @@
 {
-  "name": "@aislamov/diffusers.js",
-  "version": "0.9.3",
+  "name": "@waganawa/diffusers.js",
+  "version": "0.0.1",
   "license": "MIT",
   "author": {
     "name": "Arthur Islamov",

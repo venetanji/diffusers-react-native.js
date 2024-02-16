@@ -42,7 +42,7 @@ export class PipelineBase {
       batchSize,
       numChannels,
       Math.floor(width / this.vaeScaleFactor),
-      height / this.vaeScaleFactor,
+      Math.floor(height / this.vaeScaleFactor),
     ]
 
     return randomNormalTensor(latentShape, undefined, undefined, 'float32', seed)
@@ -59,10 +59,10 @@ export class PipelineBase {
       .div(2)
       .add(0.5)
       .clipByValue(0, 1)
-    // .mul(255)
-    // .round()
-    // .clipByValue(0, 255)
-    // .transpose(0, 2, 3, 1)
+      // .mul(255)
+      // .round()
+      // .clipByValue(0, 255)
+      // .transpose(0, 2, 3, 1)
     return [images]
   }
 

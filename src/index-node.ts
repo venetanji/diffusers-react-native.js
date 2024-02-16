@@ -5,7 +5,6 @@ import { onnxruntimeBackend } from 'onnxruntime-node/dist/backend.js'
 import * as ORT from '@aislamov/onnxruntime-web64'
 
 export * from './pipelines/StableDiffusionPipeline'
-export * from './pipelines/StableDiffusionXLPipeline'
 export * from './pipelines/DiffusionPipeline'
 export * from './pipelines/common'
 export * from './hub'

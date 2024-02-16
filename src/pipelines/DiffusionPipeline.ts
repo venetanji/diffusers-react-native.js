@@ -2,9 +2,6 @@ import { PretrainedOptions } from '@/pipelines/common'
 import { GetModelFileOptions } from '@/hub/common'
 import { getModelJSON } from '@/hub'
 import { StableDiffusionPipeline } from '@/pipelines/StableDiffusionPipeline'
-import { StableDiffusionControlNetPipeline } from './StableDiffusionControlNetPipeline'
-import { StableDiffusionXLPipeline } from '@/pipelines/StableDiffusionXLPipeline'
-import { LatentConsistencyModelPipeline } from '@/pipelines/LatentConsistencyModelPipeline'
 import { LCMScheduler } from '@/schedulers/LCMScheduler'
 
 export class DiffusionPipeline {
@@ -14,24 +11,10 @@ export class DiffusionPipeline {
     }
 
     const index = await getModelJSON(modelRepoOrPath, 'model_index.json', true, opts)
-    let pipe: StableDiffusionXLPipeline
+    let pipe: StableDiffusionPipeline
     switch (index['_class_name']) {
-      case 'StableDiffusionPipeline':
-      case 'OnnxStableDiffusionPipeline':
-        if (typeof index.controlnet !== 'undefined') {
-          return StableDiffusionControlNetPipeline.fromPretrained(modelRepoOrPath, options)
-        }
+      case 'ORTStableDiffusionPipeline':
         return StableDiffusionPipeline.fromPretrained(modelRepoOrPath, options)
-      case 'StableDiffusionXLPipeline':
-      case 'ORTStableDiffusionXLPipeline':
-        return StableDiffusionXLPipeline.fromPretrained(modelRepoOrPath, options)
-      case 'LCMStableDiffusionXLPipeline':
-        pipe = await StableDiffusionXLPipeline.fromPretrained(modelRepoOrPath, options)
-        // @ts-ignore
-        pipe.scheduler = new LCMScheduler(pipe.scheduler.config)
-        return pipe
-      case 'LatentConsistencyModelPipeline':
-        return LatentConsistencyModelPipeline.fromPretrained(modelRepoOrPath, options)
       default:
         throw new Error(`Unknown pipeline type ${index['_class_name']}`)
     }
