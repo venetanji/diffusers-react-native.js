@@ -53,7 +53,7 @@ export class LCMStableDiffusionPipeline extends PipelineBase {
       ...options,
     }
 
-    const usegpu = false ? inferMode === 'cpu' : true
+    const usegpu = inferMode === 'cpu' ? false : true
 
     // order matters because WASM memory cannot be decreased. so we load the biggest one first
     const unet = await loadModel(
