@@ -39,7 +39,7 @@ export class Session {
 
     if (!gpuEnable) {
       onnxSessionOptions = {
-        executionProviders: ['wasm'],
+        executionProviders: ['cpu'],
         //executionMode: 'parallel',
       }
     }
