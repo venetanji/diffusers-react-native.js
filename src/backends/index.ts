@@ -9,7 +9,7 @@ const ONNX = ORT.default ?? ORT
 
 const isNode = typeof process !== 'undefined' && process?.release?.name === 'node'
 
-const onnxSessionOptions = isNode
+let onnxSessionOptions = isNode
   ? {
     executionProviders: ['cpu'],
     executionMode: 'parallel',
@@ -22,7 +22,7 @@ export class Session {
   private session: InferenceSession
   public config: Record<string, unknown>
 
-  constructor (session: InferenceSession, config: Record<string, unknown> = {}) {
+  constructor (session: InferenceSession, config: Record<string, unknown> = {}, gpuEnable: boolean = false) {
     this.session = session
     this.config = config || {}
   }
@@ -32,9 +32,17 @@ export class Session {
     weightsPathOrBuffer?: string|ArrayBuffer,
     weightsFilename?: string,
     config?: Record<string, unknown>,
+    gpuEnable?: boolean,
     options?: InferenceSession.SessionOptions,
   ) {
     const arg = typeof modelOrPath === 'string' ? modelOrPath : new Uint8Array(modelOrPath)
+
+    if (!gpuEnable) {
+      onnxSessionOptions = {
+        executionProviders: ['cpu'],
+        executionMode: 'parallel',
+      }
+    }
 
     const sessionOptions = {
       ...onnxSessionOptions,

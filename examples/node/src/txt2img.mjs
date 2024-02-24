@@ -8,7 +8,7 @@ function parseCommandLineArgs() {
   const args = minimist(process.argv.slice(2));
 
   return {
-    m: args.m || 'aislamov/stable-diffusion-2-1-base-onnx',
+    m: args.m || 'WGNW/chamcham_v1_checkpoint_onnx',
     prompt: args.prompt || 'an astronaut riding a horse',
     negativePrompt: args.negativePrompt || '',
     rev: args.rev,
@@ -20,10 +20,10 @@ function parseCommandLineArgs() {
 async function main() {
   const args = parseCommandLineArgs();
   const pipe = await DiffusionPipeline.fromPretrained(
-    args.m,
+    args.m, 'gpu',
     {
       revision: args.rev,
-    }
+    },
   )
 
   const progressBar = new progress.SingleBar({

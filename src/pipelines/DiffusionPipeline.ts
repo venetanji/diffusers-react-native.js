@@ -1,20 +1,19 @@
 import { PretrainedOptions } from '@/pipelines/common'
 import { GetModelFileOptions } from '@/hub/common'
 import { getModelJSON } from '@/hub'
-import { StableDiffusionPipeline } from '@/pipelines/StableDiffusionPipeline'
+import { LCMStableDiffusionPipeline } from '@/pipelines/LCMStableDiffusionPipeline'
 import { LCMScheduler } from '@/schedulers/LCMScheduler'
 
 export class DiffusionPipeline {
-  static async fromPretrained (modelRepoOrPath: string, options?: PretrainedOptions) {
+  static async fromPretrained (modelRepoOrPath: string, options?: PretrainedOptions, device?: string) {
     const opts: GetModelFileOptions = {
       ...options,
     }
 
     const index = await getModelJSON(modelRepoOrPath, 'model_index.json', true, opts)
-    let pipe: StableDiffusionPipeline
     switch (index['_class_name']) {
       case 'ORTStableDiffusionPipeline':
-        return StableDiffusionPipeline.fromPretrained(modelRepoOrPath, options)
+        return LCMStableDiffusionPipeline.fromPretrained(modelRepoOrPath, device, options)
       default:
         throw new Error(`Unknown pipeline type ${index['_class_name']}`)
     }

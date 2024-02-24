@@ -28,4 +28,5 @@ yarn-error.log*
 /examples/*/node_modules
 /examples/*/.cache
 /examples/*/dist
+/examples/*/output*
 /dist

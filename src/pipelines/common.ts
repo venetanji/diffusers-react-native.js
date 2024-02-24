@@ -78,6 +78,7 @@ export async function loadModel (
   modelRepoOrPath: string,
   filename: string,
   opts: GetModelFileOptions,
+  gpuEnable: boolean,
 ) {
   const model = await getModelFile(modelRepoOrPath, filename, true, opts)
   let weights = await getModelFile(modelRepoOrPath, filename + '_data', false, opts)
@@ -91,5 +92,5 @@ export async function loadModel (
 
   const config = await getModelJSON(modelRepoOrPath, dirName + '/config.json', false, opts)
 
-  return Session.create(model, weights, weightsName, config)
+  return Session.create(model, weights, weightsName, config, gpuEnable)
 }

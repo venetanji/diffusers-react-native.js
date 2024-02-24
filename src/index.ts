@@ -2,7 +2,7 @@
 import browserCache from '@/hub/browser'
 import { setCacheImpl } from '@/hub'
 
-export * from './pipelines/StableDiffusionPipeline'
+export * from './pipelines/LCMStableDiffusionPipeline'
 export * from './pipelines/DiffusionPipeline'
 export * from './pipelines/common'
 export * from './hub'

@@ -25,7 +25,7 @@ export interface StableDiffusionInput {
   strength?: number
 }
 
-export class StableDiffusionPipeline extends PipelineBase {
+export class LCMStableDiffusionPipeline extends PipelineBase {
   declare scheduler: LCMScheduler
 
   constructor (unet: Session, vaeDecoder: Session, vaeEncoder: Session, textEncoder: Session, tokenizer: CLIPTokenizer, scheduler: LCMScheduler) {
@@ -48,29 +48,32 @@ export class StableDiffusionPipeline extends PipelineBase {
     )
   }
 
-  static async fromPretrained (modelRepoOrPath: string, options?: PretrainedOptions) {
+  static async fromPretrained (modelRepoOrPath: string, inferMode: string, options?: PretrainedOptions) {
     const opts: GetModelFileOptions = {
       ...options,
     }
+
+    const usegpu = false ? inferMode === 'cpu' : true
 
     // order matters because WASM memory cannot be decreased. so we load the biggest one first
     const unet = await loadModel(
       modelRepoOrPath,
       'unet/model.onnx',
       opts,
+      usegpu,
     )
-    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.onnx', opts)
-    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.onnx', opts)
-    const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.onnx', opts)
+    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.onnx', opts, usegpu)
+    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.onnx', opts, usegpu)
+    const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.onnx', opts, usegpu)
 
     const schedulerConfig = await getModelJSON(modelRepoOrPath, 'scheduler/scheduler_config.json', true, opts)
-    const scheduler = StableDiffusionPipeline.createScheduler(schedulerConfig)
+    const scheduler = LCMStableDiffusionPipeline.createScheduler(schedulerConfig)
 
     const tokenizer = await CLIPTokenizer.from_pretrained(modelRepoOrPath, { ...opts, subdir: 'tokenizer' })
     await dispatchProgress(opts.progressCallback, {
       status: ProgressStatus.Ready,
     })
-    return new StableDiffusionPipeline(unet, vae, vaeEncoder, textEncoder, tokenizer, scheduler)
+    return new LCMStableDiffusionPipeline(unet, vae, vaeEncoder, textEncoder, tokenizer, scheduler)
   }
 
   getWEmbedding (batchSize: number, guidanceScale: number, embeddingDim = 512) {
