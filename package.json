@@ -1,17 +1,19 @@
 {
   "name": "@waganawa/diffusers.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "author": {
     "name": "Arthur Islamov",
     "email": "arthur@islamov.ai",
     "url": "https://islamov.ai"
   },
-  "contributors":[{
-    "name": "waganawa",
-    "email": "m4a1carbin4@gmail.com",
-    "url": "https://github.com/m4a1carbin4"
-  }],
+  "contributors": [
+    {
+      "name": "waganawa",
+      "email": "m4a1carbin4@gmail.com",
+      "url": "https://github.com/m4a1carbin4"
+    }
+  ],
   "type": "module",
   "dependencies": {
     "@aislamov/onnxruntime-web64": "^1.0.6",
