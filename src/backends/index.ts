@@ -1,8 +1,8 @@
 // @ts-ignore
-import * as ORT from '@aislamov/onnxruntime-web64'
-import type { InferenceSession } from 'onnxruntime-common'
+import * as ORT from 'onnxruntime-react-native'
+import type { InferenceSession } from 'onnxruntime-react-native'
 import { replaceTensors } from '@/util/Tensor'
-import { Tensor } from '@xenova/transformers'
+import { Tensor } from 'onnxruntime-react-native'
 
 // @ts-ignore
 const ONNX = ORT.default ?? ORT
