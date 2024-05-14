@@ -1,5 +1,5 @@
 {
-  "name": "@waganawa/diffusers.js",
+  "name": "@venetanji/diffusers.js",
   "version": "0.0.7",
   "license": "MIT",
   "author": {
@@ -12,6 +12,11 @@
       "name": "waganawa",
       "email": "m4a1carbin4@gmail.com",
       "url": "https://github.com/m4a1carbin4"
+    },
+    {
+      "name": "venetanji",
+      "email": "giovanni.lion@gmail.com",
+      "url": "https://github.com/venetanji"
     }
   ],
   "type": "module",
