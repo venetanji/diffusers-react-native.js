@@ -16,7 +16,6 @@
   ],
   "type": "module",
   "dependencies": {
-    "@aislamov/onnxruntime-web64": "^1.0.6",
     "@huggingface/hub": "^0.8.5",
     "@types/node": "^16.18.34",
     "@xenova/transformers": "2.6.2",
@@ -24,7 +23,7 @@
     "idb": "^7.1.1",
     "module-alias": "^2.2.3",
     "onnxruntime-common": "1.16.1",
-    "onnxruntime-node": "1.16.1",
+    "onnxruntime-react-native": "1.16.1",
     "seedrandom": "^3.0.5",
     "sharp": "^0.32.6",
     "wasm-feature-detect": "^1.5.1"
@@ -36,7 +35,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "lint": "eslint --ext .ts,.tsx src"
   },
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "exports": {
     ".": {
       "node": {
@@ -44,8 +43,8 @@
         "import": "./dist/index-node.esm.js"
       },
       "default": {
-        "require": "./dist/index.js",
-        "import": "./dist/index.esm.js"
+        "require": "./src/index.js",
+        "import": "./src/index.esm.js"
       }
     }
   },
