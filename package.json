@@ -40,7 +40,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "lint": "eslint --ext .ts,.tsx src"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "exports": {
     ".": {
       "node": {
@@ -48,8 +48,8 @@
         "import": "./dist/index-node.esm.js"
       },
       "default": {
-        "require": "./src/index.js",
-        "import": "./src/index.esm.js"
+        "require": "./dist/index.js",
+        "import": "./dist/index.esm.js"
       }
     }
   },
@@ -73,18 +73,12 @@
     "@types/seedrandom": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "clang-format": "^1.8.0",
-    "esbuild": "0.19.4",
+    "esbuild": "^0.19.4",
     "eslint": "^8.52.0",
     "eslint-config-standard": "^17.1.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
-  },
-  "overrides": {
-    "@xenova/transformers": {
-      "onnxruntime-common": "1.16.1",
-      "onnxruntime-node": "1.16.1"
-    }
   },
   "_moduleAliases": {
     "@": "src"
