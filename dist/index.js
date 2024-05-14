@@ -30,7 +30,7 @@
   ));
 
   // src/hub/browser.ts
-  var import_hub2 = __require("@huggingface/hub");
+  var import_hub2 = require("@/hub/browser");
 
   // src/hub/indexed-db.ts
   var import_idb = __require("idb");

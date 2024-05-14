@@ -1,7 +1,7 @@
 import { downloadFile } from '@huggingface/hub'
-import { DbCache } from '@/hub/indexed-db'
-import { GetModelFileOptions, pathJoin } from '@/hub/common'
-import { dispatchProgress, ProgressCallback, ProgressStatus } from '@/pipelines/common'
+import { DbCache } from './indexed-db'
+import { GetModelFileOptions, pathJoin } from './common'
+import { dispatchProgress, ProgressCallback, ProgressStatus } from '../pipelines/common'
 
 let cacheDir = ''
 export function setModelCacheDir (dir: string) {

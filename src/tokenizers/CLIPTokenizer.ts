@@ -1,5 +1,5 @@
 import { PreTrainedTokenizer, PretrainedOptions, Tensor } from '@xenova/transformers'
-import { getModelJSON, getModelTextFile } from '@/hub'
+import { getModelJSON, getModelTextFile } from '../hub'
 
 interface TokenizerOptions {
   text_pair?: null|string

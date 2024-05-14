@@ -1,9 +1,9 @@
 import { InferenceSession } from 'onnxruntime-common'
 import { Tensor } from '@xenova/transformers'
-import { replaceTensors } from '@/util/Tensor'
-import { GetModelFileOptions } from '@/hub/common'
-import { getModelFile, getModelJSON } from '@/hub'
-import { Session } from '@/backends'
+import { replaceTensors } from '../util/Tensor'
+import { GetModelFileOptions } from '../hub/common'
+import { getModelFile, getModelJSON } from '../hub'
+import { Session } from '../backends'
 
 export async function sessionRun (session: InferenceSession, inputs: Record<string, Tensor>) {
   // @ts-ignore

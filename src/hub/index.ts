@@ -1,4 +1,4 @@
-import { CacheImpl, GetModelFileOptions } from '@/hub/common'
+import { CacheImpl, GetModelFileOptions } from './common'
 
 let cacheImpl: CacheImpl = null
 

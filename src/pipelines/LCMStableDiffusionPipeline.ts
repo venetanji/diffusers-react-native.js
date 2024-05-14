@@ -1,13 +1,13 @@
 "use strict"
-import { LCMScheduler, LCMSchedulerConfig } from '@/schedulers/LCMScheduler'
-import { CLIPTokenizer } from '@/tokenizers/CLIPTokenizer'
-import { cat, randomNormalTensor, range } from '@/util/Tensor'
+import { LCMScheduler, LCMSchedulerConfig } from '../schedulers/LCMScheduler'
+import { CLIPTokenizer } from '../tokenizers/CLIPTokenizer'
+import { cat, randomNormalTensor, range } from '../util/Tensor'
 import { Tensor } from '@xenova/transformers'
 import { dispatchProgress, loadModel, PretrainedOptions, ProgressCallback, ProgressStatus } from './common'
-import { getModelJSON } from '@/hub'
-import { Session } from '@/backends'
-import { GetModelFileOptions } from '@/hub/common'
-import { PipelineBase } from '@/pipelines/PipelineBase'
+import { getModelJSON } from '../hub'
+import { Session } from '../backends'
+import { GetModelFileOptions } from '../hub/common'
+import { PipelineBase } from './PipelineBase'
 
 export interface StableDiffusionInput {
   prompt: string

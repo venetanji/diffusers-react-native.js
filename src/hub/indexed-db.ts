@@ -1,5 +1,5 @@
 import { IDBPDatabase, openDB } from 'idb'
-import { dispatchProgress, ProgressCallback, ProgressStatus } from '@/pipelines/common'
+import { dispatchProgress, ProgressCallback, ProgressStatus } from '../pipelines/common'
 
 interface FileMetadata {
   chunks: number;

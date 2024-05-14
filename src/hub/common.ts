@@ -1,4 +1,4 @@
-import { ProgressCallback } from '@/pipelines/common'
+import { ProgressCallback } from '../pipelines/common'
 
 export interface GetModelFileOptions {
   progressCallback?: ProgressCallback

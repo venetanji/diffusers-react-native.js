@@ -1,8 +1,8 @@
-import { Session } from '@/backends'
-import { CLIPTokenizer } from '@/tokenizers/CLIPTokenizer'
-import { SchedulerBase } from '@/schedulers/SchedulerBase'
+import { Session } from '../backends'
+import { CLIPTokenizer } from '../tokenizers/CLIPTokenizer'
+import { SchedulerBase } from '../schedulers/SchedulerBase'
 import { Tensor } from '@xenova/transformers'
-import {cat, randomNormalTensor} from '@/util/Tensor'
+import {cat, randomNormalTensor} from '../util/Tensor'
 
 export class PipelineBase {
   public unet: Session

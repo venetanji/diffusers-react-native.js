@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as ORT from 'onnxruntime-react-native'
 import type { InferenceSession } from 'onnxruntime-react-native'
-import { replaceTensors } from '@/util/Tensor'
+import { replaceTensors } from '../util/Tensor'
 import { Tensor } from 'onnxruntime-react-native'
 
 // @ts-ignore

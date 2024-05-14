@@ -1,5 +1,5 @@
-import { linspace, range } from '@/util/Tensor'
-import { betasForAlphaBar } from '@/schedulers/common'
+import { linspace, range } from '../util/Tensor'
+import { betasForAlphaBar } from './common'
 import { Tensor } from '@xenova/transformers'
 
 export interface SchedulerConfig {

@@ -1,7 +1,7 @@
 import { PretrainedOptions } from '@/pipelines/common'
 import { GetModelFileOptions } from '@/hub/common'
-import { getModelJSON } from '@/hub'
-import { LCMStableDiffusionPipeline } from '@/pipelines/LCMStableDiffusionPipeline'
+import { getModelJSON } from '../hub'
+import { LCMStableDiffusionPipeline } from './LCMStableDiffusionPipeline'
 import { LCMScheduler } from '@/schedulers/LCMScheduler'
 
 export class DiffusionPipeline {

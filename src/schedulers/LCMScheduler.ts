@@ -1,6 +1,6 @@
-import { SchedulerBase, SchedulerConfig } from '@/schedulers/SchedulerBase'
+import { SchedulerBase, SchedulerConfig } from './SchedulerBase'
 import { Tensor } from '@xenova/transformers'
-import { randomNormalTensor, scalarTensor } from '@/util/Tensor'
+import { randomNormalTensor, scalarTensor } from '../util/Tensor'
 
 export interface LCMSchedulerConfig extends SchedulerConfig {
   rescale_betas_zero_snr: boolean,
