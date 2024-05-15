@@ -14,33 +14,35 @@ export function getCacheKey (modelRepoOrPath: string, fileName: string, revision
 
 export async function getModelFile (modelRepoOrPath: string, fileName: string, fatal = true, options: GetModelFileOptions = {}) {
   const revision = options.revision || 'main'
-  const cachePath = getCacheKey(modelRepoOrPath, fileName, revision)
-  const cache = new DbCache()
-  await cache.init()
-  const cachedData = await cache.retrieveFile(cachePath, options.progressCallback, fileName)
-  if (cachedData) {
-    if (options.returnText) {
-      const decoder = new TextDecoder('utf-8')
-      return decoder.decode(cachedData.file)
-    }
+  // const cachePath = getCacheKey(modelRepoOrPath, fileName, revision)
+  // const cache = new DbCache()
+  // await cache.init()
+  // const cachedData = await cache.retrieveFile(cachePath, options.progressCallback, fileName)
+  // if (cachedData) {
+  //   if (options.returnText) {
+  //     const decoder = new TextDecoder('utf-8')
+  //     return decoder.decode(cachedData.file)
+  //   }
 
-    return cachedData.file
-  }
+  //   return cachedData.file
+  // }
 
   let response: Response|null|undefined
   // now local cache
-  if (cacheDir) {
-    response = await fetch(cachePath)
-    // create-react-app will return 200 with HTML for missing files
-    if (!response || !response.body || response.status !== 200 || response.headers.get('content-type')?.startsWith('text/html')) {
-      response = null
-    }
-  }
+  // if (cacheDir) {
+  //   response = await fetch(cachePath)
+  //   // create-react-app will return 200 with HTML for missing files
+  //   if (!response || !response.body || response.status !== 200 || response.headers.get('content-type')?.startsWith('text/html')) {
+  //     response = null
+  //   }
+  // }
 
   try {
     // now try the hub
     if (!response) {
+      console.log('Downloading', modelRepoOrPath, fileName, revision)
       response = await downloadFile({ repo: modelRepoOrPath, path: fileName, revision })
+      console.log(response)
     }
 
     // read response
@@ -49,7 +51,7 @@ export async function getModelFile (modelRepoOrPath: string, fileName: string, f
     }
 
     const buffer = await readResponseToBuffer(response, options.progressCallback, fileName)
-    await cache.storeFile(buffer, cachePath)
+    //await cache.storeFile(buffer, cachePath)
     if (options.returnText) {
       const decoder = new TextDecoder('utf-8')
       return decoder.decode(buffer)
