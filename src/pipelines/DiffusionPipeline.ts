@@ -2,10 +2,9 @@ import { PretrainedOptions } from '@/pipelines/common'
 import { GetModelFileOptions } from '@/hub/common'
 import { getModelJSON } from '../hub'
 import { LCMStableDiffusionPipeline } from './LCMStableDiffusionPipeline'
-import { LCMScheduler } from '@/schedulers/LCMScheduler'
 
 export class DiffusionPipeline {
-  static async fromPretrained (modelRepoOrPath: string, options?: PretrainedOptions, device?: string) {
+  static async fromPretrained(modelRepoOrPath: string, options?: PretrainedOptions, device?: string) {
     const opts: GetModelFileOptions = {
       ...options,
     }

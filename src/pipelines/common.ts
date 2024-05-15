@@ -80,17 +80,9 @@ export async function loadModel (
   opts: GetModelFileOptions,
   gpuEnable: boolean,
 ) {
+  console.log("loading model")
   const model = await getModelFile(modelRepoOrPath, filename, true, opts)
-  let weights = await getModelFile(modelRepoOrPath, filename + '_data', false, opts)
-  let weightsName = 'model.onnx_data'
-
   const dirName = filename.split('/')[0]
-  if (!weights) {
-    weights = await getModelFile(modelRepoOrPath, dirName + '/weights.pb', false, opts)
-    weightsName = 'weights.pb'
-  }
-
   const config = await getModelJSON(modelRepoOrPath, dirName + '/config.json', false, opts)
-
-  return Session.create(model, weights, weightsName, config, gpuEnable)
+  return Session.create(model, config)
 }

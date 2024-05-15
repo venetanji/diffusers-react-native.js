@@ -58,13 +58,13 @@ export class LCMStableDiffusionPipeline extends PipelineBase {
     // order matters because WASM memory cannot be decreased. so we load the biggest one first
     const unet = await loadModel(
       modelRepoOrPath,
-      'unet/model.onnx',
+      'unet/model.ort',
       opts,
       usegpu,
     )
-    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.onnx', opts, usegpu)
-    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.onnx', opts, usegpu)
-    const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.onnx', opts, usegpu)
+    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.ort', opts, usegpu)
+    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.ort', opts, usegpu)
+    const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.ort', opts, usegpu)
 
     const schedulerConfig = await getModelJSON(modelRepoOrPath, 'scheduler/scheduler_config.json', true, opts)
     const scheduler = LCMStableDiffusionPipeline.createScheduler(schedulerConfig)

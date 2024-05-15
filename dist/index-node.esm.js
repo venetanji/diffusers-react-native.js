@@ -751,12 +751,6 @@ import { Tensor as Tensor6 } from "@xenova/transformers";
 import * as ORT from "onnxruntime-react-native";
 var ONNX = ORT.default ?? ORT;
 var isNode = typeof process !== "undefined" && process?.release?.name === "node";
-var onnxSessionOptions = isNode ? {
-  executionProviders: ["cpu"],
-  executionMode: "parallel"
-} : {
-  executionProviders: ["webgpu"]
-};
 var Session = class _Session {
   session;
   config;
@@ -764,38 +758,10 @@ var Session = class _Session {
     this.session = session;
     this.config = config || {};
   }
-  static async create(modelOrPath, weightsPathOrBuffer, weightsFilename, config, gpuEnable, options) {
+  static async create(modelOrPath, config, gpuEnable, options) {
     const arg = typeof modelOrPath === "string" ? modelOrPath : new Uint8Array(modelOrPath);
-    if (!gpuEnable) {
-      onnxSessionOptions = {
-        executionProviders: ["cpu"],
-        executionMode: "parallel"
-      };
-    }
-    const sessionOptions = {
-      ...onnxSessionOptions,
-      ...options
-    };
-    const weightsParams = {
-      externalWeights: weightsPathOrBuffer,
-      externalWeightsFilename: weightsFilename
-    };
-    const executionProviders = sessionOptions.executionProviders.map((provider) => {
-      if (typeof provider === "string") {
-        return {
-          name: provider,
-          ...weightsParams
-        };
-      }
-      return {
-        ...provider,
-        ...weightsParams
-      };
-    });
-    const session = ONNX.InferenceSession.create(arg, {
-      ...sessionOptions,
-      executionProviders
-    });
+    console.log("Creating onnx session");
+    const session = ONNX.InferenceSession.create(arg);
     return new _Session(await session, config);
   }
   async run(inputs) {
@@ -851,16 +817,11 @@ function dispatchProgress(cb, payload) {
   }
 }
 async function loadModel(modelRepoOrPath, filename, opts, gpuEnable) {
+  console.log("loading model");
   const model = await getModelFile2(modelRepoOrPath, filename, true, opts);
-  let weights = await getModelFile2(modelRepoOrPath, filename + "_data", false, opts);
-  let weightsName = "model.onnx_data";
   const dirName = filename.split("/")[0];
-  if (!weights) {
-    weights = await getModelFile2(modelRepoOrPath, dirName + "/weights.pb", false, opts);
-    weightsName = "weights.pb";
-  }
   const config = await getModelJSON(modelRepoOrPath, dirName + "/config.json", false, opts);
-  return Session.create(model, weights, weightsName, config, gpuEnable);
+  return Session.create(model, config);
 }
 
 // src/pipelines/PipelineBase.ts
@@ -944,13 +905,13 @@ var LCMStableDiffusionPipeline = class _LCMStableDiffusionPipeline extends Pipel
     const usegpu = inferMode === "cpu" ? false : true;
     const unet = await loadModel(
       modelRepoOrPath,
-      "unet/model.onnx",
+      "unet/model.ort",
       opts,
       usegpu
     );
-    const textEncoder = await loadModel(modelRepoOrPath, "text_encoder/model.onnx", opts, usegpu);
-    const vaeEncoder = await loadModel(modelRepoOrPath, "vae_encoder/model.onnx", opts, usegpu);
-    const vae = await loadModel(modelRepoOrPath, "vae_decoder/model.onnx", opts, usegpu);
+    const textEncoder = await loadModel(modelRepoOrPath, "text_encoder/model.ort", opts, usegpu);
+    const vaeEncoder = await loadModel(modelRepoOrPath, "vae_encoder/model.ort", opts, usegpu);
+    const vae = await loadModel(modelRepoOrPath, "vae_decoder/model.ort", opts, usegpu);
     const schedulerConfig = await getModelJSON(modelRepoOrPath, "scheduler/scheduler_config.json", true, opts);
     const scheduler = _LCMStableDiffusionPipeline.createScheduler(schedulerConfig);
     const tokenizer = await CLIPTokenizer.from_pretrained(modelRepoOrPath, { ...opts, subdir: "tokenizer" });

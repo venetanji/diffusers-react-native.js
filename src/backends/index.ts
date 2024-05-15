@@ -9,15 +9,6 @@ const ONNX = ORT.default ?? ORT
 
 const isNode = typeof process !== 'undefined' && process?.release?.name === 'node'
 
-let onnxSessionOptions = isNode
-  ? {
-    executionProviders: ['cpu'],
-    executionMode: 'parallel',
-  }
-  : {
-    executionProviders: ['webgpu'],
-  }
-
 export class Session {
   private session: InferenceSession
   public config: Record<string, unknown>
@@ -29,49 +20,15 @@ export class Session {
 
   static async create (
     modelOrPath: string|ArrayBuffer,
-    weightsPathOrBuffer?: string|ArrayBuffer,
-    weightsFilename?: string,
     config?: Record<string, unknown>,
     gpuEnable?: boolean,
     options?: InferenceSession.SessionOptions,
   ) {
     const arg = typeof modelOrPath === 'string' ? modelOrPath : new Uint8Array(modelOrPath)
 
-    if (!gpuEnable) {
-      onnxSessionOptions = {
-        executionProviders: ['cpu'],
-        executionMode: 'parallel',
-      }
-    }
-
-    const sessionOptions = {
-      ...onnxSessionOptions,
-      ...options,
-    }
-
-    const weightsParams = {
-      externalWeights: weightsPathOrBuffer,
-      externalWeightsFilename: weightsFilename,
-    }
-    const executionProviders = sessionOptions.executionProviders.map((provider) => {
-      if (typeof provider === 'string') {
-        return {
-          name: provider,
-          ...weightsParams,
-        }
-      }
-
-      return {
-        ...provider,
-        ...weightsParams,
-      }
-    })
-
+    console.log("Creating onnx session")
     // @ts-ignore
-    const session = ONNX.InferenceSession.create(arg, {
-      ...sessionOptions,
-      executionProviders,
-    })
+    const session = ONNX.InferenceSession.create(arg)
 
     // @ts-ignore
     return new Session(await session, config)
