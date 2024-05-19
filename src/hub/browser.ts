@@ -2,6 +2,7 @@ import { downloadFile } from '@huggingface/hub'
 import { DbCache } from './indexed-db'
 import { GetModelFileOptions, pathJoin } from './common'
 import { dispatchProgress, ProgressCallback, ProgressStatus } from '../pipelines/common'
+import * as RNFS from 'react-native-fs'
 
 let cacheDir = ''
 export function setModelCacheDir (dir: string) {
@@ -39,25 +40,22 @@ export async function getModelFile (modelRepoOrPath: string, fileName: string, f
 
   try {
     // now try the hub
-    if (!response) {
+    const folder = "/storage/emulated/0/Android/data/com.playgen/files"
+    const alreadyDownloaded = await RNFS.exists(`file://${folder}/${fileName}`)
+    console.log(alreadyDownloaded)
+    if (!alreadyDownloaded) {
       console.log('Downloading', modelRepoOrPath, fileName, revision)
-      response = await downloadFile({ repo: modelRepoOrPath, path: fileName, revision })
+      const response = await RNFS.downloadFile({
+        fromUrl: `https://huggingface.co/${modelRepoOrPath}/resolve/${revision}/${fileName}?download=true`,
+        toFile: `file://${folder}/${fileName}`,
+      }).promise
       console.log(response)
     }
-
-    // read response
-    if (!response || !response.body || response.status !== 200 || response.headers.get('content-type')?.startsWith('text/html')) {
-      throw new Error(`Error downloading ${fileName}`)
-    }
-
-    const buffer = await readResponseToBuffer(response, options.progressCallback, fileName)
-    //await cache.storeFile(buffer, cachePath)
     if (options.returnText) {
-      const decoder = new TextDecoder('utf-8')
-      return decoder.decode(buffer)
+      return await RNFS.readFile(folder + '/' + fileName, 'utf8')
+    } else {
+      return `${folder}/${fileName}`
     }
-
-    return buffer
   } catch (e) {
     if (!fatal) {
       return null

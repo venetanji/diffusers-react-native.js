@@ -66,10 +66,10 @@ export class LCMStableDiffusionPipeline extends PipelineBase {
     const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.ort', opts, usegpu)
     const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.ort', opts, usegpu)
 
-    const schedulerConfig = await getModelJSON(modelRepoOrPath, 'scheduler/scheduler_config.json', true, opts)
+    const schedulerConfig = await getModelJSON("SimianLuo/LCM_Dreamshaper_v7", 'scheduler/scheduler_config.json', true, opts)
     const scheduler = LCMStableDiffusionPipeline.createScheduler(schedulerConfig)
 
-    const tokenizer = await CLIPTokenizer.from_pretrained(modelRepoOrPath, { ...opts, subdir: 'tokenizer' })
+    const tokenizer = await CLIPTokenizer.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", { ...opts, subdir: 'tokenizer' })
     await dispatchProgress(opts.progressCallback, {
       status: ProgressStatus.Ready,
     })
