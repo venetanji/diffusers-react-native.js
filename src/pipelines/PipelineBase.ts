@@ -49,7 +49,7 @@ export class PipelineBase {
   }
 
   async makeImages (latents: Tensor) {
-    console.log("VAE")
+    //console.log("VAE")
     // using taesd scaling is 1 so this is commented out
     //latents = latents.div(this.vaeDecoder.config.scaling_factor || 0.18215)
 
