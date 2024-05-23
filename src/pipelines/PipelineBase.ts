@@ -49,20 +49,28 @@ export class PipelineBase {
   }
 
   async makeImages (latents: Tensor) {
-    latents = latents.div(this.vaeDecoder.config.scaling_factor || 0.18215)
+    console.log("VAE")
+    // using taesd scaling is 1 so this is commented out
+    //latents = latents.div(this.vaeDecoder.config.scaling_factor || 0.18215)
 
     const decoded = await this.vaeDecoder.run(
       { latent_sample: latents },
     )
-
-    const images = decoded.sample
+    
+    const raw = decoded.sample
       .div(2)
       .add(0.5)
-      .clipByValue(0, 1)
-      // .mul(255)
-      // .round()
-      // .clipByValue(0, 255)
-      // .transpose(0, 2, 3, 1)
+      .mul(255)
+      .round()
+      .clipByValue(0, 255)
+
+    const image = raw[0]
+
+    const alpha = new Tensor('float32', new Float32Array(raw.dims[2] * raw.dims[3]).fill(255), [1, raw.dims[2], raw.dims[3]])
+    const alphaimage = cat([image, alpha], 0)
+    const images = alphaimage.transpose(1, 2, 0)
+
+    console.log("VAE Done")
     return [images]
   }
 
