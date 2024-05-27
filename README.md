@@ -1,5 +1,6 @@
 # diffuser.js for react-native
 
+
 Original diffusers.js repo https://github.com/dakenf/diffusers.js
 
 Only LCM is working at the moment. Adapted to use tased as vae.
@@ -144,6 +145,10 @@ const styles = StyleSheet.create({
 });
 export default App;
 ```
+
+
+
+![WhatsApp Image 2024-05-21 at 18 43 16_0259e93e](https://github.com/venetanji/diffusers-react-native.js/assets/36767/33f65848-f22a-495c-83b6-ae1de2f39fa1)
 
 
 
