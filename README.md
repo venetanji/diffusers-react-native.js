@@ -1,52 +1,150 @@
-# diffuser.js based modification library for support ORTStableDiffusionPipeline With LCM Schedulers
+# diffuser.js for react-native
 
-original diffusers.js repo https://github.com/dakenf/diffusers.js
+Original diffusers.js repo https://github.com/dakenf/diffusers.js
+
+Only LCM is working at the moment. Adapted to use tased as vae.
 
 ## Installation
 
+Add the dependency to your react native project
+
 ```bash
-npm i @waganawa/diffusers.js
+yarn add https://github.com/venetanji/diffusers-react-native.js
 ```
+
+Alias transformers.js in package.json:
+
+```
+"@xenova/transformers": "https://github.com/venetanji/transformers.js.git#merge",
+```
+Forked from: https://github.com/hans00/transformers.js/tree/merge
 
 ## Usage
 
-Browser (see examples/react)
-```js
-import { DiffusionPipeline } from '@waganawa/diffusers.js'
+Example App.tsx:
 
-const pipe = DiffusionPipeline.fromPretrained('WGNW/chamcham_v1_checkpoint_onnx')
-const images = pipe.run({
-  prompt: "an astronaut running a horse",
-  numInferenceSteps: 8,
-})
+```
+import React, { useEffect, useState, useRef } from 'react';
+import type {PropsWithChildren} from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+  Button,
+  Alert,
+  Image
+} from 'react-native';
+import { LCMStableDiffusionPipeline } from '@venetanji/diffusers.js'
+import { Skia, AlphaType, ColorType } from "@shopify/react-native-skia";
 
-const canvas = document.getElementById('canvas')
-const data = await images[0].toImageData({ tensorLayout: 'NCWH', format: 'RGB' });
-canvas.getContext('2d').putImageData(data, 0, 0);
+
+const App = () => {
+  const [pipe, setPipe] = useState(null);
+  const createSession = async () => {
+    // download model if the file does not exist
+    if (pipe === null) {
+
+      const apipe = await LCMStableDiffusionPipeline.fromPretrained('Aryanne/tiny_sd_lcm_ort')
+      setPipe(apipe)
+
+    } else {
+      console.log('Session already created')
+    }
+  };
+
+  const [imageUri, setImageUri] = useState({uri: 'https://reactnative.dev/img/tiny_logo.png'});
+
+
+  const generate = async () => {
+    if (pipe === null) {
+      console.log('Session not created')
+      return
+    }
+    //await createSession()
+    console.log("Generating image...")
+    const square = 512
+    const {width, height} = {width: square, height: square}
+
+    const progressCallback = (payload:any) => {
+      console.log(payload)
+    }
+
+    const images = await pipe.run({
+      prompt: "A photograph of a horse on mars, highly detailed",
+      width: width,
+      height: height,
+      numInferenceSteps: 4,
+      guidanceScale: 1.8,
+      //beta_schedule: "scaled_linear",
+      progressCallback: progressCallback
+    })
+    const pixels = new Uint8Array(images[0].data);
+
+    const imagedata = Skia.Data.fromBytes(pixels)
+    // console.log("Creating skia image")
+    const img = Skia.Image.MakeImage(
+      {
+        width: width,
+        height: height,
+        colorType: ColorType.RGBA_8888,
+        alphaType: AlphaType.Premul,
+      },
+      imagedata,
+      width * 4
+    );
+    if (!img) {
+      console.error('Failed to create image');
+      return;
+    }
+
+    setImageUri({uri: `data:image/png;base64,${img?.encodeToBase64()}`})
+    console.log('Image encoded and sent to Image component')
+  }
+
+  const GeneratedImage = () => {
+
+    return (
+      <Image
+        style={{width: 400, height: 400}}
+        source={imageUri}
+      />
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text>React native diffusion</Text>
+      <GeneratedImage></GeneratedImage>
+      <Button
+        title="Create Session"
+        onPress={() => {
+          createSession();
+        }}
+        ></Button>
+      <Button
+        title="Generate"
+        onPress={() => {
+          generate();
+        }}
+        ></Button>
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  btn: { width: '90%' },
+});
+export default App;
 ```
 
-Node.js (see examples/node)
-```js
-import { DiffusionPipeline } from '@waganawa/diffusers.js'
-import { PNG } from 'pngjs'
 
-const pipe = await DiffusionPipeline.fromPretrained('WGNW/chamcham_v1_checkpoint_onnx')
-const images = await pipe.run({
-  prompt: "an astronaut running a horse",
-  numInferenceSteps: 8,
-})
 
-const data = await images[0].mul(255).round().clipByValue(0, 255).transpose(0, 2, 3, 1)
 
-const p = new PNG({ width: 512, height: 512, inputColorType: 2 })
-p.data = Buffer.from(data.data)
-p.pack().pipe(fs.createWriteStream('output.png')).on('finish', () => {
-  console.log('Image saved as output.png');
-})
-```
-
-'WGNW/chamcham_v1_checkpoint_onnx' is merge model of 'TechnoByte/MilkyWonderland' + LCM_LoRa model with my custom lora
-
-## How does it work
-
-It uses the original repo authors modified build of onnx runtime for web with 64bit and other changes. You can see the detail list of contributions here https://github.com/dakenf/diffusers.js?tab=readme-ov-file#how-does-it-work
