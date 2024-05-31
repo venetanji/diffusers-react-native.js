@@ -115,14 +115,15 @@ export class LCMScheduler extends SchedulerBase {
       lcmOriginTimesteps.push(i * c - 1)
     }
 
-    const skippingStep = Math.floor(lcmOriginTimesteps.length / numInferenceSteps)
+    const skippingStep = lcmOriginTimesteps.length / (numInferenceSteps - 1)
     const timesteps: number[] = []
     for (let i = lcmOriginTimesteps.length - 1; i >= 0; i -= skippingStep) {
-      timesteps.push(lcmOriginTimesteps[i])
+      timesteps.push(lcmOriginTimesteps[Math.ceil(i)])
       //if (timesteps.length === numInferenceSteps) {
         //break
       //}
     }
+    timesteps.push(lcmOriginTimesteps[0])
 
     this.timeIndex = 0
 
