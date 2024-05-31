@@ -58,18 +58,18 @@ export class LCMStableDiffusionPipeline extends PipelineBase {
     // order matters because WASM memory cannot be decreased. so we load the biggest one first
     const unet = await loadModel(
       modelRepoOrPath,
-      'unet/model.with_runtime_opt.ort',
+      'unet/model.ort',
       opts,
       true,
       usegpu,
     )
 
     // Todo: make model filenames parameters
-    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.with_runtime_opt.ort', opts, false, usegpu)
-    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.with_runtime_opt.ort', opts, false, usegpu)
+    const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.ort', opts, false, usegpu)
+    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.ort', opts, false, usegpu)
     //const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.with_runtime_opt.ort', opts,false, usegpu)
     //const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.with_runtime_opt.ort', opts, false, usegpu)
-    const vae = await loadModel("deinferno/taesd-onnx", 'vae_decoder/model.onnx', opts,false, usegpu)
+    const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.ort', opts,false, usegpu)
 
 
     const schedulerConfig = await getModelJSON("SimianLuo/LCM_Dreamshaper_v7", 'scheduler/scheduler_config.json', true, opts)
