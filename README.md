@@ -13,13 +13,6 @@ Add the dependency to your react native project
 yarn add https://github.com/venetanji/diffusers-react-native.js
 ```
 
-Alias transformers.js in package.json:
-
-```
-"@xenova/transformers": "https://github.com/venetanji/transformers.js.git#merge",
-```
-Forked from: https://github.com/hans00/transformers.js/tree/merge
-
 ## Usage
 
 Example App.tsx:
