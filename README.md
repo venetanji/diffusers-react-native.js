@@ -5,6 +5,8 @@ Original diffusers.js repo https://github.com/dakenf/diffusers.js
 
 Only LCM is working at the moment. Adapted to use tased as vae.
 
+Demo: https://github.com/venetanji/rndfd/
+
 ## Installation
 
 Add the dependency to your react native project
