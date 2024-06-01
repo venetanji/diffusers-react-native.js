@@ -66,21 +66,21 @@ export class LCMStableDiffusionPipeline extends PipelineBase {
 
     // Todo: make model filenames parameters
     const textEncoder = await loadModel(modelRepoOrPath, 'text_encoder/model.ort', opts, false, usegpu)
-    const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.ort', opts, false, usegpu)
+    //const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.ort', opts, false, usegpu)
     //const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.with_runtime_opt.ort', opts,false, usegpu)
     //const vaeEncoder = await loadModel(modelRepoOrPath, 'vae_encoder/model.with_runtime_opt.ort', opts, false, usegpu)
     const vae = await loadModel(modelRepoOrPath, 'vae_decoder/model.ort', opts,false, usegpu)
 
 
-    const schedulerConfig = await getModelJSON("SimianLuo/LCM_Dreamshaper_v7", 'scheduler/scheduler_config.json', true, opts)
+    const schedulerConfig = await getModelJSON(modelRepoOrPath, 'scheduler/scheduler_config.json', true, opts)
     console.log(schedulerConfig)
     const scheduler = LCMStableDiffusionPipeline.createScheduler(schedulerConfig)
 
-    const tokenizer = await CLIPTokenizer.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", { ...opts, subdir: 'tokenizer' })
+    const tokenizer = await CLIPTokenizer.from_pretrained(modelRepoOrPath, { ...opts, subdir: 'tokenizer' })
     await dispatchProgress(opts.progressCallback, {
       status: ProgressStatus.Ready,
     })
-    return new LCMStableDiffusionPipeline(unet, vae, vaeEncoder, textEncoder, tokenizer, scheduler)
+    return new LCMStableDiffusionPipeline(unet, vae, null, textEncoder, tokenizer, scheduler)
   }
 
   getWEmbedding (batchSize: number, guidanceScale: number, embeddingDim = 512) {
