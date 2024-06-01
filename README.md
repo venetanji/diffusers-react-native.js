@@ -49,7 +49,7 @@ const App = () => {
     // download model if the file does not exist
     if (pipe === null) {
 
-      const apipe = await LCMStableDiffusionPipeline.fromPretrained('Aryanne/tiny_sd_lcm_ort')
+      const apipe = await LCMStableDiffusionPipeline.fromPretrained('venetanji/ds8lcm')
       setPipe(apipe)
 
     } else {
