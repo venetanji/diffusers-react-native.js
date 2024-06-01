@@ -74,7 +74,8 @@ const App = () => {
       width: width,
       height: height,
       numInferenceSteps: 4,
-      guidanceScale: 1.8,
+      guidanceScale: 1.4,
+      sdV1: true,
       //beta_schedule: "scaled_linear",
       progressCallback: progressCallback
     })
