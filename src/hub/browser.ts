@@ -7,7 +7,7 @@ export async function getModelFile (modelRepoOrPath: string, fileName: string, f
 
   try {
     const folder = RNFS.CachesDirectoryPath
-    // get the parent folder in filename
+
     const alreadyDownloaded = await RNFS.exists(`file://${folder}/${fileName}`)
     //console.log(alreadyDownloaded)
     if (!alreadyDownloaded) {
@@ -18,6 +18,9 @@ export async function getModelFile (modelRepoOrPath: string, fileName: string, f
       }
       //console.log('Downloading', modelRepoOrPath, fileName, revision)
       const response = await RNFS.downloadFile({
+        headers: {
+          'Authorization': 'Bearer ' + options.token,
+        },
         fromUrl: `https://huggingface.co/${modelRepoOrPath}/resolve/${revision}/${fileName}?download=true`,
         toFile: `file://${folder}/${fileName}`,
       }).promise

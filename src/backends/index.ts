@@ -27,8 +27,16 @@ export class Session {
     const arg = typeof modelOrPath === 'string' ? modelOrPath : new Uint8Array(modelOrPath)
 
     console.log("Creating onnx session")
+
+    const sessionOptions: InferenceSession.SessionOptions = {
+      executionProviders: [{
+        name: "cpu"
+      }],
+      graphOptimizationLevel: 'all',
+      ...options
+    }
     // @ts-ignore
-    const session = ONNX.InferenceSession.create(arg)
+    const session = ONNX.InferenceSession.create(arg, sessionOptions)
 
     // @ts-ignore
     return new Session(await session, config)

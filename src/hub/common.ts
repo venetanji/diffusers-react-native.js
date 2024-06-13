@@ -4,6 +4,7 @@ export interface GetModelFileOptions {
   progressCallback?: ProgressCallback
   revision?: string
   returnText?: boolean
+  token?: string
 }
 
 export interface CacheImpl {

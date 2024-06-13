@@ -241,10 +241,10 @@ export class CLIPTokenizer extends PreTrainedTokenizer {
 
   static async from_pretrained (pretrained_model_name_or_path: string, options: ClipPreTrainedOptions = { subdir: 'tokenizer' }) {
     const [vocab, merges, tokenizerConfig] = await Promise.all([
-      getModelJSON(pretrained_model_name_or_path, `${options.subdir}/vocab.json`, true, { revision: options.revision }),
+      getModelJSON(pretrained_model_name_or_path, `${options.subdir}/vocab.json`, true, options),
       // getModelJSON(pretrained_model_name_or_path, `${options.subdir}/special_tokens_map.json`, true, options),
-      getModelTextFile(pretrained_model_name_or_path, `${options.subdir}/merges.txt`, true, { revision: options.revision }),
-      getModelJSON(pretrained_model_name_or_path, `${options.subdir}/tokenizer_config.json`, true, { revision: options.revision }),
+      getModelTextFile(pretrained_model_name_or_path, `${options.subdir}/merges.txt`, true, options),
+      getModelJSON(pretrained_model_name_or_path, `${options.subdir}/tokenizer_config.json`, true, options),
     ])
     const tokenizerJSON = {
       normalizer: {
